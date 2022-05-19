@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const res = require('express/lib/response');
 const app = express();
 const ObjectId = require('mongodb').ObjectId;
 require('dotenv').config();
@@ -36,6 +37,18 @@ async function run() {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await todoCollection.deleteOne(query);
+            res.send(result);
+        });
+
+        app.put('/todo/:id', async (req, res) => {
+            const id = req.params.id;
+            const complete = req.body;
+            const query = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: complete,
+            };
+            const result = await todoCollection.updateOne(query, updateDoc, options);
             res.send(result);
         });
     }
